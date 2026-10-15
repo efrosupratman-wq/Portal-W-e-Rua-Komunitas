@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WÁE RUA KOMUNITAS - Portal Warga</title>
+    <!-- FontAwesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f0f6ff; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 414px; background: #f7faff; min-height: 100vh; padding: 20px 16px 90px 16px; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        
+        @keyframes gantiWarnaOtomatis {
+            0%   { background: #1a237e; box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3); }
+            25%  { background: #2e7d32; box-shadow: 0 6px 16px rgba(46, 125, 50, 0.3); }
+            50%  { background: #8e24aa; box-shadow: 0 6px 16px rgba(142, 36, 170, 0.3); }
+            75%  { background: #d97706; box-shadow: 0 6px 16px rgba(217, 119, 6, 0.3); }
+            100% { background: #1a237e; box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3); }
+        }
+
+        .user-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            margin-top: 10px; 
+            padding: 14px 16px; 
+            border-radius: 20px; 
+            color: white; 
+            animation: gantiWarnaOtomatis 8s infinite ease-in-out; 
+        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #ffffff; }
+        .user-info h2 { font-size: 16px; color: #ffffff; font-weight: 800; }
+        .user-info p { font-size: 12px; color: rgba(255, 255, 255, 0.85); }
+        .header-action { color: #ffffff; font-size: 18px; }
+
+        .slider-wrapper { 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px; 
+            scroll-snap-type: x mandatory; 
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch; 
+        }
+        .slider-wrapper::-webkit-scrollbar { display: none; }
+
+        .card-pesta { 
+            min-width: 290px; 
+            max-width: 300px; 
+            flex: 0 0 auto; 
+            border-radius: 20px; 
+            padding: 12px; 
+            color: white; 
+            scroll-snap-align: start; 
+            animation: gantiWarnaOtomatis 8s infinite ease-in-out; 
+        }
+        
+        .card-pesta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; }
+        .badge-title { background: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+        .pesta-date { font-size: 11px; opacity: 0.9; }
+        .pesta-details { background: white; border-radius: 16px; padding: 14px; color: #1e293b; }
+        .time-loc { font-size: 10px; color: #64748b; margin-bottom: 4px; }
+        .pesta-name { font-size: 15px; color: #0f172a; margin-bottom: 2px; }
+        .location-name { font-size: 11px; color: #64748b; margin-bottom: 10px; }
+        .kewajiban-box { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 8px 10px; border-radius: 8px; font-size: 11px; color: #334155; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .kewajiban-box i { color: #2563eb; }
+        .progress-bar-container { height: 6px; background: #e2e8f0; border-radius: 10px; position: relative; margin-bottom: 14px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #2563eb, #ff7a00); border-radius: 10px; position: relative; }
+        
+        .btn-detail { display: block; width: 100%; background: #212529; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 13px; text-align: center; text-decoration: none; cursor: pointer; margin-bottom: 6px; }
+        .btn-detail:hover { background: #343a40; }
+
+        .menu-section { margin-bottom: 20px; }
+        .menu-title { font-size: 14px; color: #1e293b; margin-bottom: 12px; font-weight: 700; }
+        .menu-list { display: flex; flex-direction: column; gap: 10px; }
+        .menu-item { background: white; padding: 12px 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); cursor: pointer; text-decoration: none; }
+        .menu-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .icon-blue { background: #2563eb; color: white; }
+        .icon-light-blue { background: #e0f2fe; color: #0284c7; }
+        .icon-soft-blue { background: #dbeafe; color: #2563eb; }
+        .icon-orange { background: #ffede1; color: #ff7a00; }
+        .icon-purple { background: #f3e8ff; color: #8e24aa; }
+        .menu-item span { flex: 1; font-size: 13px; font-weight: 600; color: #334155; }
+        .arrow { font-size: 12px; color: #94a3b8; }
+
+        .announcement-card { background: white; padding: 14px 16px; border-radius: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); margin-bottom: 20px; }
+        .announcement-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #ff7a00; margin-bottom: 6px; }
+        .announcement-text { font-size: 12px; color: #334155; font-weight: 600; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 414px; background: white; display: flex; justify-content: space-around; padding: 8px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); z-index: 10; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 11px; gap: 2px; cursor: pointer; text-decoration: none; }
+        .nav-item.active { color: #2563eb; font-weight: 700; }
+        .nav-icon-box { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .nav-item.active .nav-icon-box { background: #2563eb; color: white; }
+
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 360px; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .modal-header h3 { font-size: 15px; color: #1e3a8a; font-weight: 800; }
+        .close-btn { background: none; border: none; font-size: 18px; color: #64748b; cursor: pointer; }
+        .table-custom { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .table-custom th, .table-custom td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .table-custom th { background: #f8fafc; color: #1e3a8a; font-weight: 700; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="user-header">
+            <div class="user-info">
+                <img src="https://picsum.photos/100/100?random=50" alt="Foto Warga" class="avatar">
+                <div>
+                    <h2>WÁE RUA KOMUNITAS</h2>
+                    <p>Portal Pemantauan Warga</p>
+                </div>
+            </div>
+            <div class="header-action"><i class="fa-solid fa-eye"></i></div>
+        </div>
+
+        <div class="slider-wrapper" id="userSliderContainer"></div>
+
+        <div class="menu-section">
+            <h4 class="menu-title">Menu Pemantauan Warga</h4>
+            <div class="menu-list">
+                <div class="menu-item" onclick="bukaModalJadwal()">
+                    <div class="menu-icon icon-blue"><i class="fa-solid fa-calendar-days"></i></div>
+                    <span>Jadwal Pesta</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+
+                <div class="menu-item" onclick="bukaModalPengurus()">
+                    <div class="menu-icon icon-orange"><i class="fa-solid fa-user-gear"></i></div>
+                    <span>Seksi Pengurus</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+
+                <div class="menu-item" onclick="bukaModalDanaKhusus()">
+                    <div class="menu-icon icon-purple"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                    <span>Pantau Dana Adat (Sate, Teing Hang, Wali Kepok)</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+
+                <!-- Tombol Utama Penghubung ke Laporan -->
+                <a href="laporan.html" class="menu-item">
+                    <div class="menu-icon icon-light-blue"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <span>Laporan Kas & Riwayat Pesta</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </a>
+
+                <a href="datakk.html" class="menu-item">
+                    <div class="menu-icon icon-soft-blue"><i class="fa-solid fa-users-gear"></i></div>
+                    <span>Data KK Warga</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="announcement-card">
+            <div class="announcement-header">
+                <span><i class="fa-solid fa-bullhorn" style="color: #ff7a00;"></i> Informasi Portal</span>
+            </div>
+            <p class="announcement-text">Portal ini otomatis menampilkan data panitia dan rincian iuran yang diinput oleh admin.</p>
+        </div>
+
+        <div class="bottom-nav">
+            <a href="index.html" class="nav-item active">
+                <div class="nav-icon-box"><i class="fa-solid fa-house-chimney"></i></div>
+                <span>Dasbor</span>
+            </a>
+            <a href="laporan.html" class="nav-item">
+                <div class="nav-icon-box"><i class="fa-solid fa-file-lines"></i></div>
+                <span>Laporan</span>
+            </a>
+            <a href="datakk.html" class="nav-item">
+                <div class="nav-icon-box"><i class="fa-solid fa-users-rectangle"></i></div>
+                <span>Data KK</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="modal" id="modalJadwal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-calendar-days"></i> Daftar Jadwal Pesta</h3>
+                <button class="close-btn" onclick="tutupModal('modalJadwal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="isiTabelJadwal"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalPengurus">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-gear"></i> Seksi Pengurus Pesta</h3>
+                <button class="close-btn" onclick="tutupModal('modalPengurus')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="isiTabelPengurus"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalDanaKhusus">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-hand-holding-dollar"></i> Pantau Dana Adat</h3>
+                <button class="close-btn" onclick="tutupModal('modalDanaKhusus')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="isiTabelDanaKhusus"></div>
+        </div>
+    </div>
+
+    <script>
+        let autoSlideTimer = null;
+
+        function muatJadwalUser() {
+            const container = document.getElementById('userSliderContainer');
+            const daftarAcara = JSON.parse(localStorage.getItem('jadwalPesta_WaeRua')) || [];
+            container.innerHTML = '';
+
+            if (daftarAcara.length === 0) {
+                container.innerHTML = `
+                    <div class="card-pesta" style="width: 100%;">
+                        <div class="pesta-details">
+                            <h3 class="pesta-name">Belum Ada Jadwal Pesta</h3>
+                            <p class="location-name">Admin belum menginput jadwal pesta baru.</p>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            daftarAcara.forEach((item) => {
+                const tglObj = new Date(item.tanggal + "T00:00:00");
+                const tglFormatted = tglObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                const nominalWajib = parseInt(item.wajib) || 150000;
+
+                container.innerHTML += `
+                    <div class="card-pesta">
+                        <div class="card-pesta-header">
+                            <span class="badge-title"><i class="fa-solid fa-house"></i> Jadwal Pesta</span>
+                            <span class="pesta-date">${tglFormatted}</span>
+                        </div>
+                        <div class="pesta-details">
+                            <p class="time-loc"><i class="fa-regular fa-clock"></i> 18:00 - selesai | Balai Wae Rua</p>
+                            <h3 class="pesta-name">Pesta ${item.nama}</h3>
+                            <p class="location-name"><i class="fa-solid fa-location-dot"></i> Balai Wae Rua</p>
+                            <div class="kewajiban-box">
+                                <i class="fa-solid fa-wallet"></i>
+                                <span>Kewajiban: <strong>Rp ${nominalWajib.toLocaleString('id-ID')}</strong> + <strong>5 Kg Beras</strong></span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-fill" style="width: 70%;"></div>
+                            </div>
+                            <button class="btn-detail" onclick="window.location.href='laporan.html?pesta=${encodeURIComponent(item.nama)}'">Lihat Laporan Pesta Ini</button>
+                        </div>
+                    </div>`;
+            });
+
+            jalankanAutoSlide(container, daftarAcara.length);
+        }
+
+        function jalankanAutoSlide(container, jumlahKartu) {
+            if (autoSlideTimer) clearInterval(autoSlideTimer);
+            if (jumlahKartu <= 1) return;
+
+            let indexAktif = 0;
+            const lebarGeser = 302; 
+
+            autoSlideTimer = setInterval(() => {
+                indexAktif++;
+                if (indexAktif >= jumlahKartu) indexAktif = 0;
+                container.scrollTo({ left: indexAktif * lebarGeser, behavior: 'smooth' });
+            }, 3000);
+        }
+
+        function bukaModalJadwal() {
+            const daftarAcara = JSON.parse(localStorage.getItem('jadwalPesta_WaeRua')) || [];
+            const containerTabel = document.getElementById('isiTabelJadwal');
+
+            if (daftarAcara.length === 0) {
+                containerTabel.innerHTML = `<p style="font-size: 12px; color: #64748b; text-align: center; padding: 10px;">Belum ada jadwal pesta.</p>`;
+            } else {
+                let html = `<table class="table-custom"><thead><tr><th>No</th><th>Nama Pesta</th><th>Tanggal</th><th>Wajib</th></tr></thead><tbody>`;
+                daftarAcara.forEach((item, index) => {
+                    const tgl = new Date(item.tanggal + "T00:00:00").toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                    html += `<tr><td>${index + 1}</td><td>Pesta ${item.nama}</td><td>${tgl}</td><td>Rp ${parseInt(item.wajib || 150000).toLocaleString('id-ID')}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+                containerTabel.innerHTML = html;
+            }
+            document.getElementById('modalJadwal').style.display = 'flex';
+        }
+
+        function bukaModalPengurus() {
+            const pengurus = JSON.parse(localStorage.getItem('waeRua_pengurus')) || [];
+            const container = document.getElementById('isiTabelPengurus');
+
+            if (pengurus.length === 0) {
+                container.innerHTML = `<p style="font-size: 12px; color: #64748b; text-align: center; padding: 10px;">Belum ada data pengurus dari admin.</p>`;
+            } else {
+                let html = `<table class="table-custom"><thead><tr><th>No</th><th>Jabatan</th><th>Nama</th><th>Kontak</th></tr></thead><tbody>`;
+                pengurus.forEach((item, index) => {
+                    html += `<tr><td>${index + 1}</td><td><b>${item.jabatan}</b></td><td>${item.nama}</td><td>${item.kontak}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            }
+            document.getElementById('modalPengurus').style.display = 'flex';
+        }
+
+        function bukaModalDanaKhusus() {
+            const dana = JSON.parse(localStorage.getItem('waeRua_danaKhusus')) || [];
+            const container = document.getElementById('isiTabelDanaKhusus');
+
+            if (dana.length === 0) {
+                container.innerHTML = `<p style="font-size: 12px; color: #64748b; text-align: center; padding: 10px;">Belum ada rincian dana adat yang diinput admin.</p>`;
+            } else {
+                let html = `<table class="table-custom"><thead><tr><th>No</th><th>Jenis Dana</th><th>Pemberi</th><th class="text-right">Jumlah</th></tr></thead><tbody>`;
+                let total = 0;
+                dana.forEach((item, index) => {
+                    total += Number(item.jumlah);
+                    html += `<tr><td>${index + 1}</td><td><b>${item.jenis}</b></td><td>${item.nama}</td><td class="text-right">Rp ${Number(item.jumlah).toLocaleString('id-ID')}</td></tr>`;
+                });
+                html += `</tbody></table><div style="margin-top: 10px; text-align: right; font-weight: bold; font-size: 13px; color: #1e3a8a;">Total Keseluruhan: Rp ${total.toLocaleString('id-ID')}</div>`;
+                container.innerHTML = html;
+            }
+            document.getElementById('modalDanaKhusus').style.display = 'flex';
+        }
+
+        function tutupModal(idModal) {
+            document.getElementById(idModal).style.display = 'none';
+        }
+
+        muatJadwalUser();
+
+        window.addEventListener('storage', function(e) {
+            if (['jadwalPesta_WaeRua', 'waeRua_pengurus', 'waeRua_danaKhusus'].includes(e.key)) {
+                muatJadwalUser();
+            }
+        });
+    </script>
+</body>
+  </html>
+  
