@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data KK Warga - WÁE RUA KOMUNITAS</title>
+    <!-- FontAwesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK Compat (Versi Stabil untuk Realtime Database) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f0f6ff; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 414px; background: #f7faff; min-height: 100vh; padding: 20px 16px 100px 16px; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        
+        @keyframes gantiWarnaOtomatis {
+            0%   { background: #1a237e; box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3); }
+            25%  { background: #2e7d32; box-shadow: 0 6px 16px rgba(46, 125, 50, 0.3); }
+            50%  { background: #8e24aa; box-shadow: 0 6px 16px rgba(142, 36, 170, 0.3); }
+            75%  { background: #d97706; box-shadow: 0 6px 16px rgba(217, 119, 6, 0.3); }
+            100% { background: #1a237e; box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3); }
+        }
+
+        .user-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 16px; margin-top: 10px; padding: 14px 16px; 
+            border-radius: 20px; color: white; animation: gantiWarnaOtomatis 8s infinite ease-in-out; 
+        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #ffffff; }
+        .user-info h2 { font-size: 16px; color: #ffffff; font-weight: 800; }
+        .user-info p { font-size: 12px; color: rgba(255, 255, 255, 0.85); }
+        .header-action { color: #ffffff; font-size: 18px; }
+
+        .card-box { background: white; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .card-title { font-size: 14px; color: #1e3a8a; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+        .search-box { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 12px; background: #f8fafc; outline: none; margin-bottom: 12px; }
+
+        .table-responsive { width: 100%; overflow-x: auto; max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 700; position: sticky; top: 0; }
+
+        .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; display: inline-block; }
+        .status-sudah { background-color: #dcfce7; color: #166534; }
+        .status-belum { background-color: #fee2e2; color: #991b1b; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 414px; background: white; display: flex; justify-content: space-around; padding: 8px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); z-index: 10; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; gap: 2px; cursor: pointer; text-decoration: none; }
+        .nav-item.active { color: #2563eb; font-weight: 700; }
+        .nav-icon-box { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .nav-item.active .nav-icon-box { background: #2563eb; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header User -->
+        <div class="user-header">
+            <div class="user-info">
+                <img src="https://picsum.photos/100/100?random=50" alt="Foto Warga" class="avatar">
+                <div>
+                    <h2>WÁE RUA KOMUNITAS</h2>
+                    <p>Direktori Data KK Warga</p>
+                </div>
+            </div>
+            <div class="header-action"><i class="fa-solid fa-users-rectangle"></i></div>
+        </div>
+
+        <!-- TABEL DATA KK WARGA (READ-ONLY) -->
+        <div class="card-box">
+            <div class="card-title">
+                <span><i class="fa-solid fa-address-book"></i> Daftar KK Kampung Wae Rua</span>
+                <span style="font-size: 10px; color: #2e7d32; font-weight: bold;"><i class="fa-solid fa-wifi"></i> Realtime Firebase</span>
+            </div>
+
+            <input type="text" class="search-box" id="cariKK" onkeyup="cariDataKK()" placeholder="🔍 Cari nama Kepala Keluarga...">
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama KK & Wilayah</th>
+                            <th>Beras</th>
+                            <th>Status Pesta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelKKUser">
+                        <tr><td colspan="4" style="text-align: center; color: #888; padding: 15px;">Memuat data dari server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <div class="nav-icon-box"><i class="fa-solid fa-house-chimney"></i></div>
+                <span>Dasbor</span>
+            </a>
+            <a href="datakk.html" class="nav-item active">
+                <div class="nav-icon-box"><i class="fa-solid fa-users-rectangle"></i></div>
+                <span>Data KK</span>
+            </a>
+            <a href="laporan.html" class="nav-item">
+                <div class="nav-icon-box"><i class="fa-solid fa-file-lines"></i></div>
+                <span>Laporan</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyAq-asQUtqIxfOsBNqKJPT11qVSy_HBdn4",
+            authDomain: "wae-rua-komunitas.firebaseapp.com",
+            databaseURL: "https://wae-rua-komunitas-default-rtdb.firebaseio.com",
+            projectId: "wae-rua-komunitas",
+            storageBucket: "wae-rua-komunitas.firebasestorage.app",
+            messagingSenderId: "642487999201",
+            appId: "1:642487999201:web:466f7fe1e58371ee8b35a0",
+            measurementId: "G-1M817YG85Q"
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Ambil Data Realtime dari Firebase
+        function muatDataKKUser() {
+            const dbRef = db.ref('dataKK_WaeRua');
+            dbRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                const tabel = document.getElementById('tabelKKUser');
+                tabel.innerHTML = '';
+
+                if (!data) {
+                    tabel.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #888; padding: 15px;">Belum ada data KK.</td></tr>`;
+                    return;
+                }
+
+                // Ubah object firebase menjadi array
+                const list = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+
+                list.forEach((item, index) => {
+                    const isSudah = item.status === 'Sudah';
+                    const statusBadgeClass = isSudah ? 'status-sudah' : 'status-belum';
+
+                    tabel.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${item.nama}</strong><br><small style="color:#64748b;">${item.rt || 'Wae Rua'}</small></td>
+                            <td>${item.beras || 0} Kg</td>
+                            <td><span class="badge-status ${statusBadgeClass}">${item.status}</span></td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function cariDataKK() {
+            const input = document.getElementById("cariKK").value.toUpperCase();
+            const tabel = document.getElementById("tabelKKUser");
+            const tr = tabel.getElementsByTagName("tr");
+
+            for (let i = 0; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    tr[i].style.display = txtValue.toUpperCase().indexOf(input) > -1 ? "" : "none";
+                }
+            }
+        }
+
+        // Jalankan fungsi muat data
+        muatDataKKUser();
+    </script>
+</body>
+              </html>
+              
